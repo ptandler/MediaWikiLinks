@@ -13,12 +13,16 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with MantisBT.  If not, see <http://www.gnu.org/licenses/>.
+#
+# $Id: MediaWikiLinks.php 6032 2011-12-30 11:39:15Z tandler $
+#
 
 /**
  * Changelog
  *
  * 0.1: initial version that supports [[...]] links to a wiki
  * 0.2: added support for interwiki links [[wpe:CSCW]]
+ * 0.3: support for interwiki links is now implemented
  *
  */
 
@@ -34,7 +38,7 @@ class MediaWikiLinksPlugin extends MantisFormattingPlugin {
 		$this->description = plugin_lang_get( 'description' );
 		$this->page = 'config';
 
-		$this->version = '0.2';
+		$this->version = '0.3';
 		$this->requires = array(
 			'MantisCore' => '1.2.0',
 		);
@@ -42,6 +46,10 @@ class MediaWikiLinksPlugin extends MantisFormattingPlugin {
 		$this->author = 'Peter Tandler, teambits GmbH';
 		$this->contact = 'info@teambits.de';
 		$this->url = 'http://www.teambits.de';
+		
+		if (version_compare(PHP_VERSION, '5.3.0', '<')) {
+			exit('PHP 5.3.0 is required for this plugin (uses anonymous function)');
+		}
 	}
 
 	/**
@@ -106,26 +114,42 @@ class MediaWikiLinksPlugin extends MantisFormattingPlugin {
 	 * @return string
 	 */
 	function replace_wiki_links( $p_string, $p_include_anchor = true  ) {
-		$t_url = plugin_config_get( 'wikiUrl' );
+		$t_default_url = plugin_config_get( 'wikiUrl' );
 
-		if( $p_include_anchor ) {
-			// todo: quote "/" .....
-			$t_replace_with = '<a href="' . $t_url . '$1" target="_new">$1</a>\\5';
-		} else {
-			$t_replace_with = $t_url . '$1';
-		}
-
-		// first, look for interwiki links [[key:value]] and replace those
-		$t_config = $this->interwikiConfig();
-		// look for all keys and replace
-		if( $t_config ) {
-			$t_replace_with .= ' config: ' . array_keys($t_config) . ' --- ' . $t_config;
-		} else {
-			$t_replace_with .= ' no config ';
-		}
+		// look for interwiki links [[key:value]]
+		$t_interwiki = $this->interwikiConfig();
 
 		// now replace wiki links [[...]] by the URL
-		$t_result = preg_replace( '/\[\[(.+)\]\]/i', $t_replace_with, $p_string );
+		$t_result = preg_replace_callback(
+			'/\[\[(.+)\]\]/i',
+			function ($match) use ($t_default_url, $t_interwiki, $p_include_anchor)  {
+				$t_text = $match[1];
+				$t_match = $match[1];
+				$t_url = $t_default_url;
+				
+				// check interwiki prefix
+				$t_kv = explode(':', $t_match, 2);
+				if( count($t_kv) > 1) {
+					// it has a "key:" prefix -> use replacement from interwiki table
+					$t_url = $t_interwiki[$t_kv[0]];
+					$t_match = $t_kv[1];
+					// keep the prefix in the text?
+				}
+				
+				// format url
+				$t_urlplaceholder = explode('*', $t_url, 2);
+				if( count($t_urlplaceholder) > 1 ) {
+					$t_url = $t_urlplaceholder[0] . $t_match . $t_urlplaceholder[1];
+				} else {
+					$t_url .= $t_match;
+				}
+				
+				if( $p_include_anchor ) {
+					return '<a href="' . $t_url . '" target="_new">' . $t_text. '</a>';
+				} else {
+					return $t_url;
+				}
+			}, $p_string );
 
 		return $t_result;
 	}
@@ -136,13 +160,14 @@ class MediaWikiLinksPlugin extends MantisFormattingPlugin {
 	 * @return array
 	 */
 	function interwikiConfig() {
-		$t_lines = preg_split("/\n/", plugin_config_get( 'interwikiConfig' ) );
+		$t_lines = explode("\n", plugin_config_get('interwikiConfig'));
 		
 		$t_config = array();
 		foreach( $t_lines as $t_line ) {
-			$t_kv = split(':', trim($t_line), 1);
+			//array_push($t_config, $t_line);
+			$t_kv = explode(':', trim($t_line), 2);
+			//array_push($t_config, "(((" . implode(",", array_keys($t_kv)) . ")))");
 			if( count($t_kv) > 1) {
-				echo "found ", $t_kv[0], " = ", $t_kv[1];
 				$t_config[$t_kv[0]] = $t_kv[1];
 			}
 		}
