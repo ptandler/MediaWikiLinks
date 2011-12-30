@@ -1,8 +1,8 @@
 What does the MediaWikiLinks Plugin do?
 
-The plugin allow to create links to media wiki pages (double brackets) [[...]] to be used in mantis issue descriptions.
+The plugin allows to create links to media wiki pages (double brackets) [[...]] to be used in mantis issue descriptions.
 
-This way you can use the issue description a little bit more like a wiki page.
+This way you can use the issue description a little bit more like a wiki page. This is especially handy, if you have linked a mediawiki to your mantis anyway.
 
 V0.3
 * now also supports to configure multiple external sources, similar to MediaWiki's interwiki-feature, such as [[wikipedia-en:Mantis Bug Tracker]]
