@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with MantisBT.  If not, see <http://www.gnu.org/licenses/>.
 #
-# $Id: MediaWikiLinks.php 6035 2011-12-30 12:42:53Z tandler $
+# $Id: MediaWikiLinks.php 6037 2011-12-30 14:17:49Z tandler $
 #
 
 /**
@@ -23,6 +23,7 @@
  * 0.1: initial version that supports [[...]] links to a wiki
  * 0.2: added support for interwiki links [[wpe:CSCW]]
  * 0.3: support for interwiki links is now implemented
+ * 0.4: support to specify the text to be used for the link with "|", e.g. [[wikipedia-en:Mantis Bug Tracker|more about mantis]]
  *
  */
 
@@ -38,7 +39,7 @@ class MediaWikiLinksPlugin extends MantisFormattingPlugin {
 		$this->description = plugin_lang_get( 'description' );
 		$this->page = 'config';
 
-		$this->version = '0.3';
+		$this->version = '0.4';
 		$this->requires = array(
 			'MantisCore' => '1.2.0',
 		);
