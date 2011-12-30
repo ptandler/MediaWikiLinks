@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with MantisBT.  If not, see <http://www.gnu.org/licenses/>.
 #
-# $Id: MediaWikiLinks.php 6033 2011-12-30 12:00:32Z tandler $
+# $Id: MediaWikiLinks.php 6035 2011-12-30 12:42:53Z tandler $
 #
 
 /**
@@ -121,11 +121,18 @@ class MediaWikiLinksPlugin extends MantisFormattingPlugin {
 
 		// now replace wiki links [[...]] by the URL
 		$t_result = preg_replace_callback(
-			'/\[\[(.+)\]\]/i',
+			'/\[\[([^\]]+)\]\]/i',
 			function ($match) use ($t_default_url, $t_interwiki, $p_include_anchor)  {
 				$t_text = $match[1];
 				$t_id = $match[1];
 				$t_url = $t_default_url;
+				
+				// check if text was given separately by "|"
+				$t_kv = explode('|', $t_text, 2);
+				if( count($t_kv) > 1 ) {
+					$t_id = $t_kv[0];
+					$t_text = $t_kv[1];
+				}
 				
 				// check interwiki prefix
 				$t_kv = explode(':', $t_id, 2);
