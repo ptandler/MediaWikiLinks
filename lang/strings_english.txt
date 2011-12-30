@@ -33,4 +33,4 @@ $s_plugin_MediaWikiLinks_description = 'Allow links to media wiki pages (double 
 
 $s_plugin_MediaWikiLinks_config = 'Configuration';
 $s_plugin_MediaWikiLinks_wiki_url = 'URL of the wiki installation';
-$s_plugin_MediaWikiLinks_interwiki_config = 'Inter-wiki configuration (name:URL per line)';
+$s_plugin_MediaWikiLinks_interwiki_config = 'Inter-wiki configuration, per line give a "name:URL" pair. Use "*" as placeholder.';

@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with MantisBT.  If not, see <http://www.gnu.org/licenses/>.
 #
-# $Id: MediaWikiLinks.php 6032 2011-12-30 11:39:15Z tandler $
+# $Id: MediaWikiLinks.php 6033 2011-12-30 12:00:32Z tandler $
 #
 
 /**
@@ -58,7 +58,7 @@ class MediaWikiLinksPlugin extends MantisFormattingPlugin {
 	function config() {
 		return array(
 			'wikiUrl'		=> 'http://en.wikipedia.org/wiki/',
-			'interwikiConfig'	=> "wpe:http://en.wikipedia.org/wiki/\nwpd:http://de.wikipedia.org/wiki/",
+			'interwikiConfig'	=> "wikipedia-en:http://en.wikipedia.org/wiki/\nwikipedia-de:http://de.wikipedia.org/wiki/Spezial:Suche?search=*&go=Artikel",
 		);
 	}
 
@@ -124,24 +124,24 @@ class MediaWikiLinksPlugin extends MantisFormattingPlugin {
 			'/\[\[(.+)\]\]/i',
 			function ($match) use ($t_default_url, $t_interwiki, $p_include_anchor)  {
 				$t_text = $match[1];
-				$t_match = $match[1];
+				$t_id = $match[1];
 				$t_url = $t_default_url;
 				
 				// check interwiki prefix
-				$t_kv = explode(':', $t_match, 2);
-				if( count($t_kv) > 1) {
-					// it has a "key:" prefix -> use replacement from interwiki table
+				$t_kv = explode(':', $t_id, 2);
+				if( count($t_kv) > 1 && $t_interwiki[$t_kv[0]] ) {
+					// it has a "interwiki:" prefix -> use replacement from interwiki table
 					$t_url = $t_interwiki[$t_kv[0]];
-					$t_match = $t_kv[1];
+					$t_id = $t_kv[1];
 					// keep the prefix in the text?
 				}
 				
 				// format url
 				$t_urlplaceholder = explode('*', $t_url, 2);
 				if( count($t_urlplaceholder) > 1 ) {
-					$t_url = $t_urlplaceholder[0] . $t_match . $t_urlplaceholder[1];
+					$t_url = $t_urlplaceholder[0] . $t_id . $t_urlplaceholder[1];
 				} else {
-					$t_url .= $t_match;
+					$t_url .= $t_id;
 				}
 				
 				if( $p_include_anchor ) {

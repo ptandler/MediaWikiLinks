@@ -33,4 +33,4 @@ $s_plugin_MediaWikiLinks_description = 'Ermöglicht Seiten in eindem media wiki 
 
 $s_plugin_MediaWikiLinks_config = 'Konfiguration';
 $s_plugin_MediaWikiLinks_wiki_url = 'URL der wiki Installation';
-$s_plugin_MediaWikiLinks_interwiki_config = 'Inter-Wiki-Konfiguration (name:URL pro Zeile)';
+$s_plugin_MediaWikiLinks_interwiki_config = 'Inter-Wiki-Konfiguration pro Zeile: "name:URL"-Paare, "*" als Platzhalter';
